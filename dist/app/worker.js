@@ -141,7 +141,7 @@ class Worker extends base_1.default {
             const taskPromise = handler(...args, kwargs).then(result => {
                 const diff = process.hrtime(timeStart);
                 console.info(`celery.node Task ${taskName}[${taskId}] succeeded in ${diff[0] +
-                    diff[1] / 1e9}s: ${result}`);
+                    diff[1] / 1e9}s`);
                 this.backend.storeResult(taskId, result, "SUCCESS");
                 this.activeTasks.delete(taskPromise);
             }).catch(err => {

@@ -83,23 +83,14 @@ class RedisBackend {
      * @param {string} state
      */
     storeResult(taskId, result, state) {
-        return this.set(`${keyPrefix}${taskId}`, state == 'FAILURE' ?
-            JSON.stringify({
-                status: state,
-                result: null,
-                traceback: result,
-                children: [],
-                task_id: taskId,
-                date_done: new Date().toISOString()
-            }) :
-            JSON.stringify({
-                status: state,
-                result,
-                traceback: null,
-                children: [],
-                task_id: taskId,
-                date_done: new Date().toISOString()
-            }));
+        return this.set(`${keyPrefix}${taskId}`, JSON.stringify({
+            status: state,
+            result: state == 'FAILURE' ? null : result,
+            traceback: result,
+            children: [],
+            task_id: taskId,
+            date_done: new Date().toISOString()
+        }));
     }
     /**
      * @method RedisBackend#getTaskMeta

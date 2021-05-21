@@ -74,7 +74,7 @@ class AMQPBroker {
             .then(() => Promise.resolve(ch)))
             .then(ch => ch.publish(exchange, routingKey, Buffer.from(messageBody), Object.assign({ contentType,
             contentEncoding,
-            headers }, properties)));
+            headers, deliveryMode: 2 }, properties)));
     }
     /**
      * @method AMQPBroker#subscribe

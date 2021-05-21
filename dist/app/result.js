@@ -1,5 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const isFinalStatus = {
+    SUCCESS: true,
+    FAILURE: true,
+    REVOKED: true,
+};
+const isErrorStatus = {
+    TIMEOUT: true,
+    FAILURE: true,
+    REVOKED: true,
+};
 function createError(message, data) {
     const error = new Error(message);
     Object.assign(error, data);
@@ -33,7 +43,7 @@ class AsyncResult {
             }
             intervalId = setInterval(() => {
                 this.backend.getTaskMeta(this.taskId).then(meta => {
-                    if (meta) {
+                    if (meta && isFinalStatus[meta["status"]]) {
                         if (timeout) {
                             clearTimeout(timeoutId);
                         }
@@ -51,7 +61,7 @@ class AsyncResult {
         else {
             const p = new Promise((resolve) => {
                 this._cache.then(meta => {
-                    if (meta && ["SUCCESS", "FAILURE", "REVOKED"].includes(meta["status"])) {
+                    if (meta && isFinalStatus[meta["status"]]) {
                         resolve(meta);
                     }
                     else {
@@ -62,7 +72,7 @@ class AsyncResult {
             this._cache = p;
         }
         return this._cache.then((meta) => {
-            if (["TIMEOUT", "FAILURE", "REVOKED"].includes(meta["status"])) {
+            if (isErrorStatus[meta["status"]]) {
                 throw createError(meta["status"], meta["result"]);
             }
             else {
@@ -80,7 +90,7 @@ class AsyncResult {
         else {
             const p = new Promise((resolve) => {
                 this._cache.then(meta => {
-                    if (meta && ["SUCCESS", "FAILURE", "REVOKED"].includes(meta["status"])) {
+                    if (meta && isFinalStatus[meta["status"]]) {
                         resolve(meta);
                     }
                     else {

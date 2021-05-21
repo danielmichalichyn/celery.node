@@ -58,23 +58,14 @@ class AMQPBackend {
             }
         })
             .then(() => Promise.resolve(ch)))
-            .then(ch => ch.publish("", queue, Buffer.from(state == 'FAILURE' ?
-            JSON.stringify({
-                status: state,
-                result,
-                traceback: null,
-                children: [],
-                task_id: taskId,
-                date_done: new Date().toISOString()
-            }) :
-            JSON.stringify({
-                status: state,
-                result,
-                traceback: null,
-                children: [],
-                task_id: taskId,
-                date_done: new Date().toISOString()
-            })), {
+            .then(ch => ch.publish("", queue, Buffer.from(JSON.stringify({
+            status: state,
+            result: state == 'FAILURE' ? null : result,
+            traceback: null,
+            children: [],
+            task_id: taskId,
+            date_done: new Date().toISOString()
+        })), {
             contentType: "application/json",
             contentEncoding: "utf-8"
         }));
